@@ -11,10 +11,8 @@ server.use(express.json());
 server.get("/", (req, res) => res.json({ server: "up" }));
 
 /* AUTHENTICATED ROUTES */
-
-server.get("/authenticated", verifyJWT, (req, res) =>
-  res.json({ authenticated: true })
-);
+server.use(verifyJWT);
+server.get("/authenticated", (req, res) => res.json({ authenticated: true }));
 
 server.use(errorHandler);
 
