@@ -4,13 +4,13 @@ const client = jwksClient({
   jwksUri: process.env.JWKS_URI,
 });
 
-function getPublicKey(header, callback) {
+function getSigningKey(header, callback) {
   client.getSigningKey(header.kid, function (err, key) {
     if (err) {
       callback(err);
       return;
     }
-    const signingKey = key.publicKey || key.rsaPublicKey;
+    const signingKey = key.getPublicKey();
     callback(null, signingKey);
   });
 }
@@ -23,8 +23,8 @@ function verifyJWT(req, res, next) {
       issuer: process.env.COGNITO_ISSUER,
     };
 
-    jwt.verify(token, getPublicKey, options, function (err, verifiedToken) {
-      if (err || verifiedToken.token_use !== "access") {
+    jwt.verify(token, getSigningKey, options, function (err, verifiedToken) {
+      if (err || !["access", "id"].includes(verifiedToken.token_use)) {
         console.error(err || "Incorrect token type");
         next({ code: 401, message: "Unauthorized" });
         return;
