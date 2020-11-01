@@ -25,7 +25,7 @@ function verifyJWT(req, res, next) {
 
     jwt.verify(token, getPublicKey, options, function (err, verifiedToken) {
       if (err || verifiedToken.token_use !== "access") {
-        console.error(err);
+        console.error(err || "Incorrect token type");
         next({ code: 401, message: "Unauthorized" });
         return;
       }
