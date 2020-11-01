@@ -19,5 +19,5 @@ server.use(errorHandler);
 module.exports = server;
 
 function errorHandler(err, req, res, next) {
-  res.status(err.code).json({ message: err.message });
+  res.status(err.code).json(err);
 }
