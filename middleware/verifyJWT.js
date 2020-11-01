@@ -12,12 +12,15 @@ function verifyJWT(req, res, next) {
     const token = req.headers.authorization.match(/Bearer (.+)/)[1];
     const decodedJwt = jwt.decode(token, { complete: true });
     const { token_use, iss } = decodedJwt.payload;
-    if (iss !== process.env.COGNITO_ISSUER) throw new Error("Invalid issuer");
+
     if (token_use !== "access")
       throw new Error("Please provide an access token");
 
     const pem = jwkToPem(keys[decodedJwt.header.kid]);
-    req.jwt = jwt.verify(token, pem, { algorithms: ["RS256"] });
+    req.jwt = jwt.verify(token, pem, {
+      algorithms: ["RS256"],
+      issuer: process.env.COGNITO_ISSUER,
+    });
     console.log(req.jwt);
     next();
   } catch (err) {
